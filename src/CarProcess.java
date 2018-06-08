@@ -1,9 +1,14 @@
 
+import desmoj.core.exception.DelayedInterruptException;
+import desmoj.core.exception.InterruptException;
 import desmoj.core.simulator.*;
 import co.paralleluniverse.fibers.SuspendExecution;
 
 // stellt die Kundenaktivitaeten als Prozess dar
 public class CarProcess extends SimProcess {
+	
+	private final int CAR_INSERT_MAX_QUEUE = 5;
+	private final TimeSpan ORDER_TIME = new TimeSpan(1);
 
     // nuetzliche Referenz auf entsprechendes Modell
     private Schalter_Model order;
@@ -24,34 +29,44 @@ public class CarProcess extends SimProcess {
     // Beschreibung der Aktionen des Kunden vom Eintreffen bis zum Verlassen
     //   des Schalters 
     public void lifeCycle() throws SuspendExecution{
-    	// TODO: Fertig machen
     	
-    	CarProcess process = new CarProcess(order, "Car", true);
-		order.queueOrder.insert(process);
+    	// Wahrscheinlich muessen wir schalter und ausgabe model trennen
     	
-    	if(order.queueOrder.size() == 1) {
-    		order.init();
+    	if (order.queueOrder.size() > CAR_INSERT_MAX_QUEUE) {
+    		sendTraceNote("Schlange zu lang, Kunde faehrt weg.");
+    		return;
+    	}
+    	
+    	if (order.queueOrder.size() > 1) {
+    		order.queueOrder.insert(this);
+    		passivate();
+    	} else {
     		order();
     	}
     }
     
-    public void order() {
+    public void order() throws DelayedInterruptException, InterruptException, SuspendExecution {
     	order.order();
+    	
+    	hold(ORDER_TIME);
     	
         sendTraceNote("Kunde hat Bestellung aufgegeben.");
         
-    	if(output.queueOutput.size() <= 2) {
-    		output.queueOutput.insert(new CarProcess(order, "Car", true));
-    		if(output.queueOutput.size() == 1) {
-    			output.init();
-    			takeOrder();
+    	if (output.queueOutput.size() <= 2) {
+    		order.queueOrder.remove(this);
+    		output.queueOutput.insert(this);
+    		if (output.queueOutput.size() > 1) {
+    			passivate();
+    		} else {
+    			output.readyToTakeOrder();
+    			passivate();
     		}
+    	} else {
+    		passivate();
     	}
     }
     
     public void takeOrder() {
-    	order.takeOrder();
-
-        sendTraceNote("Kunde hat Bestellung angenommen und fährt weg.");
+        sendTraceNote("Kunde hat Bestellung angenommen und faehrt weg.");
     }
 }

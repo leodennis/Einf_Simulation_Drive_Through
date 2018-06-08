@@ -22,8 +22,8 @@ public class Schalter_Model extends Model {
     }
     
 	// Waiting queues
-    protected ProcessQueue<CarProcess> queueOrder;
-    protected ProcessQueue<CarProcess> queueOutput;
+    public ProcessQueue<CarProcess> queueOrder;
+    public ProcessQueue<CarProcess> queueOutput;
 	
 
     // constructor
@@ -80,8 +80,7 @@ public class Schalter_Model extends Model {
     	// Par 4: maximale Bedienzeit in Minuten
     	// Par 5: show in report?
     	// Par 6: show in trace?
-    	orderTime = 
-            new ContDistUniform(this, "Bedienzeiten", 0.5, 10.0, true, true);	
+    	orderTime = new ContDistUniform(this, "Bedienzeiten", 0.5, 10.0, true, true);	
 
     	// Warteschlange fuer Kunden initialisieren
     	// Par 1: Modellzugehoerigkeit
@@ -92,4 +91,12 @@ public class Schalter_Model extends Model {
        	queueOutput = new ProcessQueue<CarProcess>(this, "Kunden-Warteschlange",true, true);	
 	
     }
+
+	public void order() {
+		// TODO: Implement
+	}
+
+	public void readyToTakeOrder() {
+		// TODO: Implement
+	}
 }
