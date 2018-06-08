@@ -6,7 +6,8 @@ import co.paralleluniverse.fibers.SuspendExecution;
 public class CarProcess extends SimProcess {
 
     // nuetzliche Referenz auf entsprechendes Modell
-    private Schalter_Model meinModel;
+    private Schalter_Model order;
+    private Schalter_Model output;
 
     // Konstruktor
 	  // Par 1: Modellzugehoerigkeit
@@ -15,18 +16,42 @@ public class CarProcess extends SimProcess {
     public CarProcess(Model owner, String name, boolean showInTrace) {
         super(owner, name, showInTrace);
 
-        meinModel = (Schalter_Model) owner;
+        order = (Schalter_Model) owner;
+        output = (Schalter_Model) owner;
     }
 
     
     // Beschreibung der Aktionen des Kunden vom Eintreffen bis zum Verlassen
     //   des Schalters 
     public void lifeCycle() throws SuspendExecution{
-    	
     	// TODO: Fertig machen
     	
-        // Kunde wurde bedient und verlaesst den Schalterraum
-        //  -> in diesem Beispiel nur eine Meldung sinnvoll
-        sendTraceNote("Kunde wurde bedient und verlaesst den Schalterraum");
+    	CarProcess process = new CarProcess(order, "Car", true);
+		order.queueOrder.insert(process);
+    	
+    	if(order.queueOrder.size() == 1) {
+    		order.init();
+    		order();
+    	}
+    }
+    
+    public void order() {
+    	order.order();
+    	
+        sendTraceNote("Kunde hat Bestellung aufgegeben.");
+        
+    	if(output.queueOutput.size() <= 2) {
+    		output.queueOutput.insert(new CarProcess(order, "Car", true));
+    		if(output.queueOutput.size() == 1) {
+    			output.init();
+    			takeOrder();
+    		}
+    	}
+    }
+    
+    public void takeOrder() {
+    	order.takeOrder();
+
+        sendTraceNote("Kunde hat Bestellung angenommen und fährt weg.");
     }
 }
