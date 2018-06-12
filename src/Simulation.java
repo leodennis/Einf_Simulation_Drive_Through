@@ -12,15 +12,15 @@ public class Simulation {
     	
         // create new model
         // Par 1: null markiert main model, sonst Mastermodell angeben
-        Schalter_Model model = new Schalter_Model(null, "Ausgabe Modell", true, true);  
+        Restaurant_Model model = new Restaurant_Model(null, "Ausgabe Modell", true, true);  
 
         // connect model with experiment
         model.connectToExperiment(driveThroughExperiment);
         
 
         // interval for trace/debug
-        driveThroughExperiment.tracePeriod(new TimeInstant(0.0), new TimeInstant(60));
-        driveThroughExperiment.debugPeriod(new TimeInstant(0.0), new TimeInstant(60) );
+        driveThroughExperiment.tracePeriod(new TimeInstant(0.0), new TimeInstant(100));
+        driveThroughExperiment.debugPeriod(new TimeInstant(0.0), new TimeInstant(100) );
 
         // set end of simulation
         // -> here: 4h (= 240 min)

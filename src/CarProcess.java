@@ -4,69 +4,69 @@ import desmoj.core.exception.InterruptException;
 import desmoj.core.simulator.*;
 import co.paralleluniverse.fibers.SuspendExecution;
 
-// stellt die Kundenaktivitaeten als Prozess dar
+/**
+ * Car process representing a car which wants to order at the restaurant.
+ */
 public class CarProcess extends SimProcess {
 	
+	// maximum size of queue before driving away
 	private final int CAR_INSERT_MAX_QUEUE = 5;
-	private final TimeSpan ORDER_TIME = new TimeSpan(1);
 
-    // nuetzliche Referenz auf entsprechendes Modell
-    private Schalter_Model order;
-    private Schalter_Model output;
+    // reference to model
+    private Restaurant_Model restaurantModell;
+    
+    // order process where he ordered
+    public OrderProcess myOrderProcess = null;
+    public CounterProcess myCounterProcess = null;
 
-    // Konstruktor
-	  // Par 1: Modellzugehoerigkeit
-	  // Par 2: Name des Ereignisses
-	  // Par 3: show in trace?
+    /**
+     * Constructor
+     * @param owner the model
+     * @param name the name of the process
+     * @param showInTrace if it should be displayed in trace
+     */
     public CarProcess(Model owner, String name, boolean showInTrace) {
         super(owner, name, showInTrace);
-
-        order = (Schalter_Model) owner;
-        output = (Schalter_Model) owner;
+        restaurantModell = (Restaurant_Model) owner;
     }
 
-    
-    // Beschreibung der Aktionen des Kunden vom Eintreffen bis zum Verlassen
-    //   des Schalters 
     public void lifeCycle() throws SuspendExecution{
-    	
-    	// Wahrscheinlich muessen wir schalter und ausgabe model trennen
-    	
-    	if (order.queueOrder.size() > CAR_INSERT_MAX_QUEUE) {
+    	if (restaurantModell.queueOrder.size() > CAR_INSERT_MAX_QUEUE) {
     		sendTraceNote("Schlange zu lang, Kunde faehrt weg.");
     		return;
     	}
     	
-    	if (order.queueOrder.size() > 1) {
-    		order.queueOrder.insert(this);
-    		passivate();
+    	restaurantModell.queueOrder.insert(this);
+    	
+    	if (restaurantModell.queueOrder.size() > 1 || restaurantModell.queueFreeOrders.isEmpty()) {
+    		passivate(); // wait to order
     	} else {
-    		order();
+    		myOrderProcess = restaurantModell.queueFreeOrders.removeFirst();
+    		myOrderProcess.activate(); // prepare for ordering
     	}
+    	
+    	order();
     }
     
     public void order() throws DelayedInterruptException, InterruptException, SuspendExecution {
-    	order.order();
-    	
-    	hold(ORDER_TIME);
-    	
+    	// order
+		hold(new TimeSpan(restaurantModell.getOrderTime())); // wait
         sendTraceNote("Kunde hat Bestellung aufgegeben.");
         
-    	if (output.queueOutput.size() <= 2) {
-    		order.queueOrder.remove(this);
-    		output.queueOutput.insert(this);
-    		if (output.queueOutput.size() > 1) {
-    			passivate();
-    		} else {
-    			output.readyToTakeOrder();
-    			passivate();
-    		}
-    	} else {
-    		passivate();
+    	if (restaurantModell.queueCounter.size() == Restaurant_Model.MAX_COUNTER_QUEUE_SIZE) {
+    		passivate(); // wait to move into next queue
     	}
-    }
-    
-    public void takeOrder() {
-        sendTraceNote("Kunde hat Bestellung angenommen und faehrt weg.");
+    	
+    	myOrderProcess.activate(); // tell order process that he is leaving
+    	restaurantModell.queueCounter.insert(this);
+    	    	
+		if (restaurantModell.queueCounter.size() == 1 && !restaurantModell.queueFreeCounters.isEmpty()) {
+			myCounterProcess = restaurantModell.queueFreeCounters.removeFirst();
+			myCounterProcess.activate(); // prepare for taking order
+		}
+		
+		passivate(); // wait to take order
+		hold(new TimeInstant(Restaurant_Model.CAR_DRIVE_AWAY_TIME));
+		sendTraceNote("Kunde hat Bestellung angenommen und faehrt weg.");
     }
 }
