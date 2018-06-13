@@ -8,7 +8,7 @@ public class Restaurant_Model extends Model {
 	
 	public static final int MAX_COUNTER_QUEUE_SIZE = 3;
 	
-	public static final double CAR_DRIVE_AWAY_TIME = 0.5;
+	public static final double CAR_DRIVE_AWAY_TIME = 0.4;
 	
 	// random number generator for random car arrivals
 	private ContDistExponential carArrivalTime;
@@ -39,8 +39,9 @@ public class Restaurant_Model extends Model {
     public ProcessQueue<CarProcess> queueCounter;
     
     // Order and Counter queues
-    public ProcessQueue<OrderProcess> queueFreeOrders;
+    public OrderProcess orderProcess;
     public ProcessQueue<CounterProcess> queueFreeCounters;
+    public int numCounters;
 	
 
     // constructor
@@ -67,10 +68,10 @@ public class Restaurant_Model extends Model {
         newCars.activate(new TimeSpan(0.0));
         
         // initialize Orders and Counters
-        OrderProcess orderProcess = new OrderProcess(this, "Schalter", true);
-        queueFreeOrders.insert(orderProcess);
+        orderProcess = new OrderProcess(this, "Schalter", true);
         CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true);
         queueFreeCounters.insert(counterProcess);
+        numCounters = 1;
     }
 
 
@@ -91,8 +92,7 @@ public class Restaurant_Model extends Model {
        	queueOrder = new ProcessQueue<CarProcess>(this, "Kunden Schalter WS", true, true);
        	queueCounter = new ProcessQueue<CarProcess>(this, "Kunden Ausgabe WS", true, true);
        	
-       	// queues for the Orders and Counters
-       	queueFreeOrders = new ProcessQueue<OrderProcess>(this, "Freie Schalter WS", true, true);
+       	// queues Counters
         queueFreeCounters = new ProcessQueue<CounterProcess>(this, "Freie Ausgaben WS", true, true);
 	
     }

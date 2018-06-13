@@ -18,6 +18,9 @@ public class CarProcess extends SimProcess {
     // order process where he ordered
     public OrderProcess myOrderProcess = null;
     public CounterProcess myCounterProcess = null;
+    
+    boolean ordered = false;
+    boolean finished = false;
 
     /**
      * Constructor
@@ -38,10 +41,10 @@ public class CarProcess extends SimProcess {
     	
     	restaurantModell.queueOrder.insert(this);
     	
-    	if (restaurantModell.queueOrder.size() > 1 || restaurantModell.queueFreeOrders.isEmpty()) {
+    	if (restaurantModell.queueOrder.size() > 1 || restaurantModell.orderProcess.busy) {
     		passivate(); // wait to order
     	} else {
-    		myOrderProcess = restaurantModell.queueFreeOrders.removeFirst();
+    		myOrderProcess = restaurantModell.orderProcess;
     		myOrderProcess.activate(); // prepare for ordering
     	}
     	
@@ -52,8 +55,9 @@ public class CarProcess extends SimProcess {
     	// order
 		hold(new TimeSpan(restaurantModell.getOrderTime())); // wait
         sendTraceNote("Kunde hat Bestellung aufgegeben.");
+        ordered = true;
         
-    	if (restaurantModell.queueCounter.size() == Restaurant_Model.MAX_COUNTER_QUEUE_SIZE) {
+    	if (restaurantModell.queueCounter.size() >= Restaurant_Model.MAX_COUNTER_QUEUE_SIZE - (restaurantModell.numCounters - restaurantModell.queueFreeCounters.size())) {
     		passivate(); // wait to move into next queue
     	}
     	
@@ -66,7 +70,9 @@ public class CarProcess extends SimProcess {
 		}
 		
 		passivate(); // wait to take order
-		hold(new TimeInstant(Restaurant_Model.CAR_DRIVE_AWAY_TIME));
-		sendTraceNote("Kunde hat Bestellung angenommen und faehrt weg.");
+		sendTraceNote("Kunde hat Bestellung angenommen.");
+		finished = true;
+		hold(new TimeSpan(Restaurant_Model.CAR_DRIVE_AWAY_TIME));
+		sendTraceNote("Kunde faehrt weg.");
     }
 }

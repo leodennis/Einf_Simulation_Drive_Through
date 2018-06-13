@@ -5,6 +5,8 @@ import co.paralleluniverse.fibers.SuspendExecution;
 public class CounterProcess extends SimProcess {
 
     private Restaurant_Model model;
+    
+    public CarProcess car = null; // the current car he is handling
 
     public CounterProcess(Model owner, String name, boolean showInTrace) {
         super(owner, name, showInTrace);
@@ -19,7 +21,7 @@ public class CounterProcess extends SimProcess {
         		passivate(); 
         	}
         	
-        	CarProcess car = model.queueCounter.removeFirst();
+        	car = model.queueCounter.removeFirst();
         	car.myCounterProcess = this; // set this as the counter for the car
     		sendTraceNote("Bestellung wird zubereitet.");		
     		
@@ -28,13 +30,12 @@ public class CounterProcess extends SimProcess {
     		sendTraceNote("Bestellung wird uebergeben.");
     		car.activate(); // give car the order
     		
-    		if (!model.queueCounter.isEmpty()) {
-    			model.queueCounter.first().activate(); // tell car he is first now
-    		}
+    		car = null;
     		
-    		if (model.queueCounter.size() >= Restaurant_Model.MAX_COUNTER_QUEUE_SIZE - 1) {
-    			if (!model.queueOrder.isEmpty()) {
-    				model.queueOrder.first().activate(); // tell car to drive into next queue
+    		if (model.queueCounter.size() <= Restaurant_Model.MAX_COUNTER_QUEUE_SIZE - 1) {
+    			if (model.orderProcess.busy && model.orderProcess.car.ordered) {
+        			sendTraceNote("Tell car to move into next queue.");
+        			model.orderProcess.car.activate();
     			}
     		}
     		

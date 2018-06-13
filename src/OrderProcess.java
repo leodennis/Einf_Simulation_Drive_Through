@@ -5,6 +5,9 @@ import co.paralleluniverse.fibers.SuspendExecution;
 public class OrderProcess extends SimProcess {
 
     private Restaurant_Model model;
+    
+    public CarProcess car = null; // the current car he is handling
+    public boolean busy = false;  // if the process is handlig a customer currently
 
     public OrderProcess(Model owner, String name, boolean showInTrace) {
         super(owner, name, showInTrace);
@@ -15,23 +18,23 @@ public class OrderProcess extends SimProcess {
         while (true) {
         	// wait for car arrival
         	if (model.queueOrder.isEmpty()) {
-        		model.queueFreeOrders.insert(this);
+        		busy  = false;
         		passivate(); 
         	}
+        	busy = true;
         	
-    		CarProcess car = model.queueOrder.removeFirst();
-    		car.myOrderProcess = this; // set this as the process where it ordered
+    		car = model.queueOrder.removeFirst();
     		sendTraceNote("Bestellung wird angenommen.");
-    		car.activate();
+    		if (car.myOrderProcess == null) {
+        		car.myOrderProcess = this; // set this as the process where it ordered
+        		car.activate();
+    		}
+    		
     		
     		// we do not need to wait because car is waiting
     		
     		passivate(); // wait for car to drive away
-    		
-    		if (!model.queueOrder.isEmpty()) {
-    			model.queueOrder.first().activate(); // tell car to drive forward
-    		}
-        	
+    		car = null; // finished with car
         }
     }
 }

@@ -20,7 +20,7 @@ public class Simulation {
 
         // interval for trace/debug
         driveThroughExperiment.tracePeriod(new TimeInstant(0.0), new TimeInstant(100));
-        driveThroughExperiment.debugPeriod(new TimeInstant(0.0), new TimeInstant(100) );
+        driveThroughExperiment.debugPeriod(new TimeInstant(0.0), new TimeInstant(100));
 
         // set end of simulation
         // -> here: 4h (= 240 min)
