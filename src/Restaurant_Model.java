@@ -6,7 +6,7 @@ import desmoj.core.simulator.TimeSpan;
 
 public class Restaurant_Model extends Model {
 	
-	public static final int MAX_COUNTER_QUEUE_SIZE = 3;
+	public static final int MAX_COUNTER_QUEUE_SIZE = 6;
 	
 	public static final double CAR_DRIVE_AWAY_TIME = 0.4;
 	
@@ -69,9 +69,12 @@ public class Restaurant_Model extends Model {
         
         // initialize Orders and Counters
         orderProcess = new OrderProcess(this, "Schalter", true);
-        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true);
+        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, false);
         queueFreeCounters.insert(counterProcess);
         numCounters = 1;
+        counterProcess = new CounterProcess(this, "Ausgabe", true, true); //last parameter: take fastest orders first
+        queueFreeCounters.insert(counterProcess);
+        numCounters = 2;
     }
 
 
@@ -81,12 +84,17 @@ public class Restaurant_Model extends Model {
     public void init() {
 		
     	// times for car arrivals
-    	carArrivalTime =  new ContDistExponential(this, "Ankunftszeitintervall", 1.0, true, true);	
+    	carArrivalTime =  new ContDistExponential(this, "Ankunftszeitintervall", 1.0, true, true);	 // 1.5
     	carArrivalTime.setNonNegative(true);	// deactivate negative times
 
     	// times for ordering and making the order
-    	orderTime = new ContDistUniform(this, "Bestellzeit", 2.0, 8.0, true, true);	
-    	makingTime = new ContDistUniform(this, "Zubereitungszeiten", 5.0, 15.0, true, true);
+    	orderTime = new ContDistUniform(this, "Bestellzeit", 0.33, 1.5, true, true); // 0:20 - 1:30 min
+    	makingTime = new ContDistUniform(this, "Zubereitungszeiten", 0.75, 3.0, true, true); // 0:45 - 3:00 min
+    	
+    	/*
+    	 * http://time.com/money/3478752/drive-thru-fast-food-fast-casual/
+    	 * average drive-thru wait time hit 181 second
+    	 */
 
     	// queues for cars
        	queueOrder = new ProcessQueue<CarProcess>(this, "Kunden Schalter WS", true, true);

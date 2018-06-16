@@ -10,7 +10,7 @@ import co.paralleluniverse.fibers.SuspendExecution;
 public class CarProcess extends SimProcess {
 	
 	// maximum size of queue before driving away
-	private final int CAR_INSERT_MAX_QUEUE = 5;
+	private final int CAR_INSERT_MAX_QUEUE = 3; // equals 6 cars with the one who just ordered
 
     // reference to model
     private Restaurant_Model restaurantModell;
@@ -21,6 +21,13 @@ public class CarProcess extends SimProcess {
     
     boolean ordered = false;
     boolean finished = false;
+    
+    double orderTime;
+    
+    public static int missedCars = 0; // the number of cars who drove away without ordering
+    public static int servedCars = 0; // the number of cars who got their order
+
+
 
     /**
      * Constructor
@@ -31,11 +38,13 @@ public class CarProcess extends SimProcess {
     public CarProcess(Model owner, String name, boolean showInTrace) {
         super(owner, name, showInTrace);
         restaurantModell = (Restaurant_Model) owner;
+        orderTime = restaurantModell.getOrderTime();
     }
 
     public void lifeCycle() throws SuspendExecution{
     	if (restaurantModell.queueOrder.size() > CAR_INSERT_MAX_QUEUE) {
     		sendTraceNote("Schlange zu lang, Kunde faehrt weg.");
+    		missedCars++;
     		return;
     	}
     	
@@ -53,7 +62,7 @@ public class CarProcess extends SimProcess {
     
     public void order() throws DelayedInterruptException, InterruptException, SuspendExecution {
     	// order
-		hold(new TimeSpan(restaurantModell.getOrderTime())); // wait
+		hold(new TimeSpan(orderTime)); // wait
         sendTraceNote("Kunde hat Bestellung aufgegeben.");
         ordered = true;
         
@@ -74,5 +83,6 @@ public class CarProcess extends SimProcess {
 		finished = true;
 		hold(new TimeSpan(Restaurant_Model.CAR_DRIVE_AWAY_TIME));
 		sendTraceNote("Kunde faehrt weg.");
+		servedCars++;
     }
 }

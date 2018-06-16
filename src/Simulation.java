@@ -16,25 +16,26 @@ public class Simulation {
 
         // connect model with experiment
         model.connectToExperiment(driveThroughExperiment);
-        
 
         // interval for trace/debug
         driveThroughExperiment.tracePeriod(new TimeInstant(0.0), new TimeInstant(100));
         driveThroughExperiment.debugPeriod(new TimeInstant(0.0), new TimeInstant(100));
 
         // set end of simulation
-        // -> here: 4h (= 240 min)
-        driveThroughExperiment.stop(new TimeInstant(240));
+        // -> here: 18h (= 1080 min)
+        driveThroughExperiment.stop(new TimeInstant(1080));
 
         // start experiment at time 0.0
         driveThroughExperiment.start(); 
-
 
         // generate report
         driveThroughExperiment.report();
 
         // finish
         driveThroughExperiment.finish();
+        
+        System.out.println("Misses cars: " + CarProcess.missedCars);
+        System.out.println("Served cars: " + CarProcess.servedCars);
 
 	}
 
