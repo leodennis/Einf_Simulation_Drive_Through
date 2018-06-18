@@ -6,10 +6,8 @@ import desmoj.core.simulator.TimeSpan;
 
 public class Restaurant_Model extends Model {
 	
-	public static final int MAX_COUNTER_QUEUE_SIZE = 6;
-	
-	public static final double CAR_DRIVE_AWAY_TIME = 0.4;
-	
+	public static final int MAX_COUNTER_QUEUE_SIZE = 5;
+		
 	// random number generator for random car arrivals
 	private ContDistExponential carArrivalTime;
 
@@ -34,6 +32,14 @@ public class Restaurant_Model extends Model {
         return makingTime.sample();
     }
     
+    // random number generator for the time it takes for the customer to pay
+   	private ContDistUniform payingTime;
+
+       // returns a random number for the time it takes for the customer to pay
+       public double getPayingTime() {
+           return payingTime.sample();
+       }
+       
 	// Waiting queues
     public ProcessQueue<CarProcess> queueOrder;
     public ProcessQueue<CarProcess> queueCounter;
@@ -69,12 +75,12 @@ public class Restaurant_Model extends Model {
         
         // initialize Orders and Counters
         orderProcess = new OrderProcess(this, "Schalter", true);
-        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, false);
+        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, false); //last parameter: if the counter works with a ticket system
         queueFreeCounters.insert(counterProcess);
         numCounters = 1;
-        counterProcess = new CounterProcess(this, "Ausgabe", true, true); //last parameter: take fastest orders first
-        queueFreeCounters.insert(counterProcess);
-        numCounters = 2;
+        //counterProcess = new CounterProcess(this, "Ausgabe", true, true); //last parameter: if the counter works with a ticket system
+        //queueFreeCounters.insert(counterProcess);
+        //numCounters = 2;
     }
 
 
@@ -84,17 +90,13 @@ public class Restaurant_Model extends Model {
     public void init() {
 		
     	// times for car arrivals
-    	carArrivalTime =  new ContDistExponential(this, "Ankunftszeitintervall", 1.0, true, true);	 // 1.5
+    	carArrivalTime =  new ContDistExponential(this, "Ankunftszeitintervall", 1.25, true, true);	 // 1.5
     	carArrivalTime.setNonNegative(true);	// deactivate negative times
 
     	// times for ordering and making the order
-    	orderTime = new ContDistUniform(this, "Bestellzeit", 0.33, 1.5, true, true); // 0:20 - 1:30 min
-    	makingTime = new ContDistUniform(this, "Zubereitungszeiten", 0.75, 3.0, true, true); // 0:45 - 3:00 min
-    	
-    	/*
-    	 * http://time.com/money/3478752/drive-thru-fast-food-fast-casual/
-    	 * average drive-thru wait time hit 181 second
-    	 */
+    	orderTime = new ContDistUniform(this, "Bestellzeit", 0.167, 0.75, true, true); // 0:10 - 0:45 min
+    	makingTime = new ContDistUniform(this, "Zubereitungszeiten", 0.75, 8.0, true, true); // 0:45 - 8:00 min
+    	payingTime = new ContDistUniform(this, "Bezahlzeit", 0.167, 0.417, true, true); // 0:10 - 0:25 min
 
     	// queues for cars
        	queueOrder = new ProcessQueue<CarProcess>(this, "Kunden Schalter WS", true, true);
