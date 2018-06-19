@@ -8,6 +8,8 @@ public class Simulation {
 		// make new experiment
     	Experiment driveThroughExperiment = 
             new Experiment("DriveThrough-Prozess");
+    	
+    	driveThroughExperiment.setSeedGenerator((long) (Math.random()*Long.MAX_VALUE));
  
     	
         // create new model

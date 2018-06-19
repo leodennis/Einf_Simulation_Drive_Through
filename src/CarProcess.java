@@ -9,9 +9,6 @@ import co.paralleluniverse.fibers.SuspendExecution;
  * Car process representing a car which wants to order at the restaurant.
  */
 public class CarProcess extends SimProcess {
-	
-	// maximum size of queue before driving away
-	private final int CAR_INSERT_MAX_QUEUE = 3; // equals 4 cars with the one who just ordered
 
     // reference to model
     private Restaurant_Model restaurantModell;
@@ -41,7 +38,7 @@ public class CarProcess extends SimProcess {
     }
 
     public void lifeCycle() throws SuspendExecution{
-    	if (restaurantModell.queueOrder.size() > CAR_INSERT_MAX_QUEUE) {
+    	if (restaurantModell.queueOrder.size() > Restaurant_Model.CAR_INSERT_MAX_QUEUE) {
     		sendTraceNote("Schlange zu lang, Kunde faehrt weg.");
     		missedCars++;
     		return;
@@ -86,7 +83,6 @@ public class CarProcess extends SimProcess {
 					if (counter.ticketSystem) {
 						myCounterProcess = restaurantModell.queueFreeCounters.removeFirst();
 						myCounterProcess.activate(); // prepare for taking order
-						System.out.println(1);
 						break;
 					}
 				}

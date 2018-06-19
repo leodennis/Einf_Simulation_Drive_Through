@@ -6,7 +6,13 @@ import desmoj.core.simulator.TimeSpan;
 
 public class Restaurant_Model extends Model {
 	
+	private static final boolean USE_TICKET_SYSTEM = true;
+	
+	// maximum size of queue at counter
 	public static final int MAX_COUNTER_QUEUE_SIZE = 5;
+	
+	// maximum size of queue before driving away
+	public static final int CAR_INSERT_MAX_QUEUE = 3; // equals 4 cars with the one who just ordered
 		
 	// random number generator for random car arrivals
 	private ContDistExponential carArrivalTime;
@@ -57,10 +63,7 @@ public class Restaurant_Model extends Model {
 
      // description of the model TODO: EDIT
     public String description() {
-    	return "Schalter2_p Model (Prozess orientiert)l:" +
-               "simuliert einen Bankschalter, wo ankommende Kunden zuerst in einer"+
-               "Warteschlange eingereiht werden. Wenn der Schalter frei ist,"+
-               "werden sie bedient.";
+    	return "";
     }	
 
 
@@ -75,7 +78,7 @@ public class Restaurant_Model extends Model {
         
         // initialize Orders and Counters
         orderProcess = new OrderProcess(this, "Schalter", true);
-        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, false); //last parameter: if the counter works with a ticket system
+        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, USE_TICKET_SYSTEM); //last parameter: if the counter works with a ticket system
         queueFreeCounters.insert(counterProcess);
         numCounters = 1;
         //counterProcess = new CounterProcess(this, "Ausgabe", true, true); //last parameter: if the counter works with a ticket system
@@ -90,7 +93,7 @@ public class Restaurant_Model extends Model {
     public void init() {
 		
     	// times for car arrivals
-    	carArrivalTime =  new ContDistExponential(this, "Ankunftszeitintervall", 1.25, true, true);	 // 1.5
+    	carArrivalTime =  new ContDistExponential(this, "Ankunftszeitintervall", 1.25, true, true);	 // 1.25
     	carArrivalTime.setNonNegative(true);	// deactivate negative times
 
     	// times for ordering and making the order
