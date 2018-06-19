@@ -6,10 +6,10 @@ import desmoj.core.simulator.TimeSpan;
 
 public class Restaurant_Model extends Model {
 	
-	private static final boolean USE_TICKET_SYSTEM = true;
+	public static boolean USE_TICKET_SYSTEM = true;
 	
 	// maximum size of queue at counter
-	public static final int MAX_COUNTER_QUEUE_SIZE = 5;
+	public static final int MAX_COUNTER_QUEUE_SIZE = 8;
 	
 	// maximum size of queue before driving away
 	public static final int CAR_INSERT_MAX_QUEUE = 3; // equals 4 cars with the one who just ordered
