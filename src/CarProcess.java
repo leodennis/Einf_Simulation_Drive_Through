@@ -17,10 +17,12 @@ public class CarProcess extends SimProcess {
     public OrderProcess myOrderProcess = null;
     public CounterProcess myCounterProcess = null;
     
+    // progress states
     boolean ordered = false;
     boolean orderMade = false;
     boolean finished = false;
-        
+    
+    // statistics
     public static int missedCars = 0; // the number of cars who drove away without ordering
     public static int servedCars = 0; // the number of cars who got their order
 
@@ -98,6 +100,8 @@ public class CarProcess extends SimProcess {
 		servedCars++;
     }
     
+   
+    // needed for animation
     public void traceGotOrder() {
     	sendMessage(new TraceNote(currentModel(), "Kunde hat bestellung angenommen.",
 				presentTime(), this, currentEvent()));

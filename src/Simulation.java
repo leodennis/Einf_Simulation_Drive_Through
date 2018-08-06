@@ -1,6 +1,9 @@
 import desmoj.core.simulator.Experiment;
 import desmoj.core.simulator.TimeInstant;
 
+/**
+ * This class executes a Drive-Through simulation using DesmoJ.
+ */
 public class Simulation {
 
 	public static void main(String[] args) {
@@ -12,7 +15,7 @@ public class Simulation {
     	driveThroughExperiment.setSeedGenerator(3880357535495099392L);
     	
     	/*
-    	 * Seeds:
+    	 * Used Seeds for 25 Simulations:
     	 * 3880357535495099392L
     	 * 6741471850034513920L
     	 * 3555580573866427392L
@@ -40,12 +43,7 @@ public class Simulation {
     	 * 8144562481300359168L
     	 */
     	
-    	for (int i = 0; i < 25; i++) {
-    		System.out.println((long) (Math.random()*Long.MAX_VALUE));
-		}
-    	
         // create new model
-        // Par 1: null markiert main model, sonst Mastermodell angeben
         Restaurant_Model model = new Restaurant_Model(null, "Ausgabe Modell", true, true);  
 
         // connect model with experiment
@@ -68,6 +66,7 @@ public class Simulation {
         // finish
         driveThroughExperiment.finish();
         
+        // print other useful information
         System.out.println("Misses cars: " + CarProcess.missedCars);
         System.out.println("Served cars: " + CarProcess.servedCars);
 

@@ -2,12 +2,16 @@
 import desmoj.core.simulator.*;
 import co.paralleluniverse.fibers.SuspendExecution;
 
+/**
+ * Process of a car ordering.
+ */
 public class OrderProcess extends SimProcess {
 
+	// reference to model
     private Restaurant_Model model;
     
     public CarProcess car = null; // the current car he is handling
-    public boolean busy = false;  // if the process is handlig a customer currently
+    public boolean busy = false;  // if the process is handling a customer currently
 
     public OrderProcess(Model owner, String name, boolean showInTrace) {
         super(owner, name, showInTrace);

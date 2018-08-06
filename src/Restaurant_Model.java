@@ -4,8 +4,12 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.ProcessQueue;
 import desmoj.core.simulator.TimeSpan;
 
+/**
+ * The core model of the simulation.
+ */
 public class Restaurant_Model extends Model {
 	
+	// this determines if the counters use the ticket system
 	private static final boolean USE_TICKET_SYSTEM = true;
 	
 	// maximum size of queue at counter
@@ -61,9 +65,12 @@ public class Restaurant_Model extends Model {
     	super(owner, name, showInReport, showIntrace);
     }
 
-     // description of the model TODO: EDIT
+     // description of the model
     public String description() {
-    	return "";
+    	return "Simulation of a Drive-Through. Cars arrive and wait until they can place an order. "
+    			+ "If the queue is too long they will drive away without ordering. "
+    			+ "After that they have to wait until they get their order. "
+    			+ "2 Different strategies implemented: Normal and ticket system.";
     }	
 
 
@@ -78,12 +85,9 @@ public class Restaurant_Model extends Model {
         
         // initialize Orders and Counters
         orderProcess = new OrderProcess(this, "Schalter", true);
-        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, USE_TICKET_SYSTEM); //last parameter: if the counter works with a ticket system
+        CounterProcess counterProcess = new CounterProcess(this, "Ausgabe", true, USE_TICKET_SYSTEM);
         queueFreeCounters.insert(counterProcess);
         numCounters = 1;
-        //counterProcess = new CounterProcess(this, "Ausgabe", true, true); //last parameter: if the counter works with a ticket system
-        //queueFreeCounters.insert(counterProcess);
-        //numCounters = 2;
     }
 
 
@@ -107,6 +111,5 @@ public class Restaurant_Model extends Model {
        	
        	// queues Counters
         queueFreeCounters = new ProcessQueue<CounterProcess>(this, "Freie Ausgaben WS", true, true);
-	
     }
 }

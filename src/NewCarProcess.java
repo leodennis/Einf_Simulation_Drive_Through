@@ -26,7 +26,7 @@ public class NewCarProcess extends SimProcess {
             // wait until next car should arrive
             hold (new TimeSpan(model.getCarArrivalTime()));
      
-            // neuen Kunden erzeugen
+            // generates new customer
             CarProcess newCar = new CarProcess (model, "Kunde", true);
             
             // activate car process

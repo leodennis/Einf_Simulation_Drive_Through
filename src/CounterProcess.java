@@ -2,8 +2,12 @@
 import desmoj.core.simulator.*;
 import co.paralleluniverse.fibers.SuspendExecution;
 
+/**
+ * Process representing a counter which gives the orders to the customers.
+ */
 public class CounterProcess extends SimProcess {
 
+	// reference to model
     private Restaurant_Model model;
     
     public CarProcess car = null; // the current car he is handling
